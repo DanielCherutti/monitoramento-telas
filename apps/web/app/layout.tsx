@@ -4,6 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Pazini Monitoramento",
+  icons: { icon: "/images/icon.png" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
