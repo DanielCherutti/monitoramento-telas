@@ -1,4 +1,4 @@
-![Monitoramento de Telas](images/icon.png)
+![Monitoramento de Telas](https://raw.githubusercontent.com/DanielCherutti/monitoramento-telas/main/images/icon.png)
 
 # Monitoramento de Telas
 
