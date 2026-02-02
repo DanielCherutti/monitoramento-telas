@@ -1,0 +1,13 @@
+{
+  "name": "monitoramento-telas",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "docker compose up --build",
+    "lint": "npm -ws run lint",
+    "typecheck": "npm -ws run typecheck"
+  }
+}
+

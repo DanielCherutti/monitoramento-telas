@@ -1,0 +1,24 @@
+# Dependências e build – não copiar para a imagem
+node_modules
+.next
+npm-debug.log*
+.yarn
+.pnpm-store
+
+# Git e IDE
+.git
+.gitignore
+.env*.local
+.vscode
+.idea
+*.swp
+*.swo
+
+# Testes e docs (opcional – reduz contexto)
+coverage
+*.md
+!README.md
+
+# Docker
+Dockerfile
+.dockerignore

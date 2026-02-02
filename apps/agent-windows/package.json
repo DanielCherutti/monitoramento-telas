@@ -1,0 +1,49 @@
+{
+  "name": "@monitoramento/agent-windows",
+  "version": "1.0.0",
+  "description": "Agente de monitoramento de telas para Windows — envia preview da tela para o servidor",
+  "author": "Monitoramento Telas",
+  "private": true,
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "build:pkg": "tsc -p tsconfig.pkg.json && node -e \"require('fs').copyFileSync('dist-pkg/main.js','dist-pkg/main.cjs')\"",
+    "electron": "npm run build:pkg && electron .",
+    "build:exe": "npm run build:pkg && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "screenshot-desktop": "^1.15.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "@types/ws": "^8.5.13",
+    "electron": "33.0.0",
+    "electron-builder": "25.1.8",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "build": {
+    "appId": "com.monitoramento.agent",
+    "productName": "Monitoramento de Telas - Agente",
+    "electronVersion": "33.0.0",
+    "directories": { "output": "dist" },
+    "files": ["electron/**/*", "dist-pkg/**/*", "node_modules/**/*"],
+    "asarUnpack": ["node_modules/screenshot-desktop/**"],
+    "win": {
+      "target": "portable",
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "monitoramento-agent.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

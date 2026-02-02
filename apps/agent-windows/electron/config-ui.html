@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitoramento de Telas — Configuração</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f0f12;
+      --surface: #18181c;
+      --surface-hover: #1f1f24;
+      --border: #2a2a32;
+      --text: #e4e4e7;
+      --text-muted: #a1a1aa;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --success: #22c55e;
+      --error: #ef4444;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 28px 24px 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .header {
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .header p {
+      margin-top: 6px;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 0.9375rem;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .field input::placeholder {
+      color: var(--text-muted);
+      opacity: 0.8;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .field .hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .actions {
+      margin-top: 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.05s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--surface-hover);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .status {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.success {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: var(--success);
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--error);
+    }
+
+    .status.loading {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      color: var(--accent);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: -2px;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Monitoramento de Telas</h1>
+    <p>Configure a conexão com o servidor e inicie o agente</p>
+  </div>
+
+  <div class="card">
+    <h2>Conexão</h2>
+    <form id="form">
+      <div class="field">
+        <label for="apiUrl">URL da API *</label>
+        <input type="url" id="apiUrl" name="apiUrl" placeholder="http://192.168.4.90:4001" required />
+        <div class="hint">Endereço do servidor (ex.: http://IP:4001)</div>
+      </div>
+      <div class="field">
+        <label for="agentId">ID do agente</label>
+        <input type="text" id="agentId" name="agentId" placeholder="PC-SALA-01" />
+        <div class="hint">Identificador único (opcional; usa o nome do PC se vazio)</div>
+      </div>
+      <div class="field">
+        <label for="hostname">Nome exibido</label>
+        <input type="text" id="hostname" name="hostname" placeholder="Sala Reuniões" />
+        <div class="hint">Nome que aparece no dashboard (opcional)</div>
+      </div>
+      <div class="field">
+        <label for="registrationSecret">Segredo de registro *</label>
+        <input type="password" id="registrationSecret" name="registrationSecret" placeholder="dev-agent-secret" />
+        <div class="hint">Deve ser igual ao configurado na API</div>
+      </div>
+      <div class="field">
+        <label for="screenCount">Número de telas (opcional)</label>
+        <input type="number" id="screenCount" name="screenCount" min="1" max="8" placeholder="1 = automático" />
+        <div class="hint">Se tiver 2+ monitores e o seletor de tela não aparecer na plataforma, coloque 2 (ou quantas telas tiver).</div>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" id="btnSave">Salvar e iniciar</button>
+        <button type="button" class="btn btn-secondary" id="btnReconfig">Apenas reconfigurar</button>
+        <button type="button" class="btn btn-secondary" id="btnTest">Testar conexão</button>
+      </div>
+    </form>
+    <div class="status" id="status"></div>
+    <div class="status" id="testResult" style="margin-top: 10px;"></div>
+  </div>
+
+  <div class="footer">
+    As configurações são salvas localmente e usadas na próxima execução.
+    <br />
+    <button type="button" class="btn btn-secondary" id="btnLog" style="margin-top: 10px; font-size: 0.8rem;">Abrir pasta do log (diagnóstico)</button>
+    <div id="logPathHint" style="margin-top: 6px; font-size: 0.7rem; color: var(--text-muted); word-break: break-all;"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("form");
+    const statusEl = document.getElementById("status");
+    const btnSave = document.getElementById("btnSave");
+    const btnReconfig = document.getElementById("btnReconfig");
+
+    function showStatus(message, type) {
+      statusEl.textContent = message;
+      statusEl.className = "status show " + type;
+    }
+
+    function hideStatus() {
+      statusEl.className = "status";
+    }
+
+    function getFormData() {
+      const sc = form.screenCount?.value?.trim();
+      return {
+        apiUrl: form.apiUrl.value.trim(),
+        agentId: form.agentId.value.trim(),
+        hostname: form.hostname.value.trim(),
+        registrationSecret: form.registrationSecret.value.trim(),
+        fps: 1,
+        screenCount: sc ? (parseInt(sc, 10) || null) : null,
+      };
+    }
+
+    function setFormData(config) {
+      if (!config) return;
+      form.apiUrl.value = config.apiUrl || "";
+      form.agentId.value = config.agentId || "";
+      form.hostname.value = config.hostname || "";
+      form.registrationSecret.value = config.registrationSecret || "";
+      if (form.screenCount) form.screenCount.value = config.screenCount != null ? String(config.screenCount) : "";
+    }
+
+    if (window.agentApi) {
+      window.agentApi.onConfigLoaded((config) => setFormData(config));
+      window.agentApi.onAgentStarted(() => {
+        btnSave.disabled = false;
+        if (window.agentApi.minimizeToTray) window.agentApi.minimizeToTray();
+      });
+      window.agentApi.onAgentError((message) => {
+        showStatus(message, "error");
+        btnSave.disabled = false;
+      });
+
+      window.agentApi.loadConfig().then((config) => {
+        if (config) setFormData(config);
+      });
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const config = getFormData();
+      if (!config.apiUrl) {
+        showStatus("Informe a URL da API.", "error");
+        return;
+      }
+      hideStatus();
+      btnSave.disabled = true;
+      showStatus("Salvando e conectando…", "loading");
+
+      try {
+        if (window.agentApi) {
+          await window.agentApi.saveConfig(config);
+          await window.agentApi.startAgent(config);
+        }
+      } catch (err) {
+        showStatus(err.message || "Erro ao iniciar o agente.", "error");
+        btnSave.disabled = false;
+      }
+    });
+
+    btnReconfig.addEventListener("click", () => {
+      hideStatus();
+      setFormData(getFormData());
+    });
+
+    const btnTest = document.getElementById("btnTest");
+    const testResult = document.getElementById("testResult");
+
+    function showTestResult(message, type) {
+      testResult.textContent = message;
+      testResult.className = "status show " + type;
+    }
+
+    const btnLog = document.getElementById("btnLog");
+    const logPathHint = document.getElementById("logPathHint");
+    if (btnLog && window.agentApi) {
+      if (window.agentApi.getLogPath) {
+        window.agentApi.getLogPath().then((p) => {
+          if (logPathHint && p) logPathHint.textContent = "Log: " + p;
+        }).catch(() => {});
+      }
+      if (window.agentApi.openLogFolder) {
+        btnLog.addEventListener("click", () => {
+          window.agentApi.openLogFolder();
+        });
+      }
+    }
+
+    btnTest.addEventListener("click", async () => {
+      const apiUrl = form.apiUrl.value.trim();
+      const agentId = form.agentId.value.trim() || "TEST";
+      if (!apiUrl) {
+        showTestResult("Informe a URL da API antes de testar.", "error");
+        return;
+      }
+      if (!window.agentApi || !window.agentApi.testConnection) {
+        showTestResult("Teste de conexão não disponível nesta versão.", "error");
+        return;
+      }
+      showTestResult("Testando no processo do agente (API + WebSocket)…", "loading");
+
+      try {
+        const result = await window.agentApi.testConnection(apiUrl, agentId);
+        if (result && result.ok) {
+          showTestResult(result.message || "Conexão OK. Você pode salvar e iniciar.", "success");
+        } else {
+          showTestResult(result && result.message ? result.message : "Erro ao testar conexão.", "error");
+        }
+      } catch (err) {
+        showTestResult(err.message || "Erro ao testar conexão.", "error");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  ADMIN
+  SUPERVISOR
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  roles             UserRole[]
+  supervisorScopes  SupervisorScope[]
+  favorites         Favorite[]
+  viewSessions      ViewSession[] @relation("ViewSessionViewer")
+  controlSessions   ControlSession[] @relation("ControlSessionViewer")
+  annotationSessions AnnotationSession[] @relation("AnnotationSessionActor")
+}
+
+model Role {
+  id   String   @id @default(cuid())
+  name RoleName @unique
+  users UserRole[]
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model Group {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  devices   DeviceGroup[]
+  supervisorScopes SupervisorScope[]
+}
+
+model Device {
+  id        String   @id @default(cuid())
+  hostname  String
+  agentId   String   @unique
+  lastSeenAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  groups    DeviceGroup[]
+  favorites Favorite[]
+  viewSessions ViewSession[] @relation("ViewSessionTarget")
+  controlSessions ControlSession[] @relation("ControlSessionTarget")
+  annotationSessions AnnotationSession[] @relation("AnnotationSessionTarget")
+  onlineSessions DeviceOnlineSession[]
+
+  @@index([hostname])
+}
+
+model DeviceOnlineSession {
+  id         String   @id @default(cuid())
+  deviceId   String
+  startedAt  DateTime @default(now())
+  endedAt    DateTime?
+
+  device     Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId, startedAt])
+}
+
+model DeviceGroup {
+  deviceId String
+  groupId  String
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  group    Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([deviceId, groupId])
+}
+
+model SupervisorScope {
+  id           String   @id @default(cuid())
+  supervisorId String
+  groupId      String
+  canView      Boolean  @default(true)
+  canControl   Boolean  @default(false)
+  canAnnotate  Boolean  @default(true)
+  requirePromptForAnnotate Boolean @default(false)
+
+  supervisor   User  @relation(fields: [supervisorId], references: [id], onDelete: Cascade)
+  group        Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([supervisorId, groupId])
+}
+
+model Favorite {
+  id           String   @id @default(cuid())
+  supervisorId String
+  deviceId     String
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  supervisor   User   @relation(fields: [supervisorId], references: [id], onDelete: Cascade)
+  device       Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@unique([supervisorId, deviceId])
+  @@index([supervisorId, sortOrder])
+}
+
+model ViewSession {
+  id         String   @id @default(cuid())
+  viewerId   String
+  deviceId   String
+  startedAt  DateTime @default(now())
+  endedAt    DateTime?
+  reason     String?
+
+  viewer     User   @relation("ViewSessionViewer", fields: [viewerId], references: [id], onDelete: Cascade)
+  device     Device @relation("ViewSessionTarget", fields: [deviceId], references: [id], onDelete: Cascade)
+}
+
+model ControlSession {
+  id         String   @id @default(cuid())
+  viewerId   String
+  deviceId   String
+  startedAt  DateTime @default(now())
+  endedAt    DateTime?
+  reason     String?
+
+  viewer     User   @relation("ControlSessionViewer", fields: [viewerId], references: [id], onDelete: Cascade)
+  device     Device @relation("ControlSessionTarget", fields: [deviceId], references: [id], onDelete: Cascade)
+}
+
+model AnnotationSession {
+  id         String   @id @default(cuid())
+  actorId    String
+  deviceId   String
+  startedAt  DateTime @default(now())
+  endedAt    DateTime?
+  clearedAt  DateTime?
+
+  actor      User   @relation("AnnotationSessionActor", fields: [actorId], references: [id], onDelete: Cascade)
+  device     Device @relation("AnnotationSessionTarget", fields: [deviceId], references: [id], onDelete: Cascade)
+}
+
+model AuditEvent {
+  id        String   @id @default(cuid())
+  eventType String
+  actorUserId String?
+  targetDeviceId String?
+  ip        String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([eventType])
+}
+

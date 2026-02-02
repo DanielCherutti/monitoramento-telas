@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "outDir": "dist-pkg"
+  },
+  "include": ["src/main.ts", "src/entry-pkg.ts"]
+}
