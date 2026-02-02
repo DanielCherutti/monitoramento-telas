@@ -1,39 +1,65 @@
-# Monitoramento de Telas (Windows) — Web + API + Agente
+![Monitoramento de Telas](images/icon.png)
 
-Sistema on‑prem para monitorar telas Windows em tempo real, com acesso de **administradores** e **supervisores**, **favoritos** na dashboard, **auditoria/relatórios**, e suporte a **overlay de anotações** (desenho) refletido na máquina do usuário.
+# Monitoramento de Telas
 
-## Estrutura
-- `apps/api/`: API (Fastify + TypeScript + Prisma)
-- `apps/web/`: Webapp (Next.js)
-- `apps/agent-windows/`: Agente Windows (placeholder + especificação inicial)
-- `infra/`: Docker Compose e configs (Postgres/Redis/TURN opcional)
+**Sistema on‑prem para monitorar telas Windows em tempo real.**
 
-## Rodando (dev, on‑prem)
-Pré‑requisitos: Docker + Docker Compose.
+Acesso para administradores e supervisores · Dashboard com favoritos · Auditoria e relatórios · Overlay de anotações
 
-1) Suba a infra + apps:
+---
 
-```bash
-cd /root/monitoramento-telas
-docker compose up --build
+## Sobre
+
+Plataforma de **monitoramento remoto de telas** em ambiente corporativo. Administradores e supervisores visualizam dispositivos Windows em tempo real, organizam por grupos, acessam preview ao vivo dos primeiros favoritos na dashboard e podem desenhar anotações em overlay na tela do usuário. Tudo auditado e com relatórios de uso.
+
+- **On‑prem** — infraestrutura sob seu controle
+- **Roles** — admin e supervisor, com escopos distintos
+- **Preview ao vivo** — miniaturas na dashboard via WebSocket
+- **Anotações** — sessões de desenho refletidas no dispositivo
+- **Auditoria** — eventos de login, favoritos e acessos
+- **Relatórios** — top dispositivos mais acessados
+
+---
+
+## Funcionalidades
+
+| Área | Descrição |
+|------|------------|
+| **Login** | Autenticação por usuário/senha (admin e supervisor) |
+| **Dashboard** | Favoritos e lista de dispositivos; preview ao vivo nos 6 primeiros favoritos |
+| **Monitor** | Acesso à tela ao vivo do dispositivo |
+| **Grupos** | Admin cria grupos e associa dispositivos e supervisores; supervisor vê só seus grupos |
+| **Usuários** | Gestão de usuários (admin) |
+| **Auditoria** | Eventos de login, favoritos e acessos |
+| **Relatórios** | Top dispositivos mais acessados |
+| **Agente** | Registro do agente Windows (`POST /devices/register`) e envio de frames para preview |
+
+---
+
+## Stack
+
+| Camada | Tecnologia |
+|--------|------------|
+| **Web** | Next.js · React · Tailwind CSS |
+| **API** | Fastify · TypeScript · Prisma |
+| **Agente** | TypeScript · Electron (config UI) |
+| **Infra** | Docker · Docker Compose |
+
+---
+
+## Estrutura do repositório
+
+```
+monitoramento-telas/
+├── apps/
+│   ├── web/          # Frontend Next.js
+│   ├── api/          # API Fastify + Prisma
+│   └── agent-windows/ # Agente Windows (registro, preview, anotações)
+├── docs/             # Protocolo e especificações
+├── images/           # Logos e ícones
+└── docker-compose.yml
 ```
 
-2) Acesse:
-- Web: `http://localhost:3000`
-- API: `http://localhost:4000/health`
+---
 
-## Credenciais iniciais
-No primeiro boot, a API cria um usuário admin padrão:
-- usuário: `admin`
-- senha: `admin123`
-
-Troque imediatamente em produção.
-
-## Funcionalidades (MVP)
-- **Login** (admin/supervisor) e **Dashboard** com favoritos e lista de dispositivos.
-- **Preview ao vivo**: nos primeiros 6 favoritos, miniaturas via WebSocket quando o agente envia frames (`/ws/device/preview`, `/ws/supervisor/preview`).
-- **Admin — Grupos**: criar grupos, associar dispositivos e supervisores; supervisores só veem dispositivos dos grupos em que estão.
-- **Auditoria**: eventos de login, favoritos e acessos (`/audit/events`).
-- **Relatórios**: top dispositivos mais acessados (`/reports/top-devices`).
-- **Registro do agente**: `POST /devices/register` (agentId, hostname, secret) para o agente Windows se cadastrar.
-
+*Monitoramento de Telas · On‑prem · Windows*
