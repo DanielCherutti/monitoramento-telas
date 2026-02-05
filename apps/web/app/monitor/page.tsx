@@ -132,6 +132,17 @@ export default function MonitorPage() {
     setSelectedIds(new Set(favorites.map((f) => f.deviceId)));
   }, [favorites]);
 
+  const organizeLayout = useCallback(() => {
+    const list = visibleFavorites;
+    if (list.length === 0) return;
+    const next: Record<string, TileLayout> = {};
+    list.forEach((f, index) => {
+      next[f.deviceId] = getDefaultLayout(index, list.length);
+    });
+    setLayout(next);
+    saveLayout(next);
+  }, [visibleFavorites]);
+
   const loadFavorites = useCallback(async () => {
     if (!token) return;
     const res = await fetch(`${getApiUrl()}/favorites`, {
@@ -355,6 +366,15 @@ export default function MonitorPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={organizeLayout}
+              disabled={visibleFavorites.length === 0}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:pointer-events-none text-white transition-colors"
+              title="Organizar todas as telas no mesmo tamanho em grid"
+            >
+              Organizar
+            </button>
             <button
               type="button"
               onClick={() => setShowHeader(false)}

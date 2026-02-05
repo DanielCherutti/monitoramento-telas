@@ -12,7 +12,7 @@ No MVP, o agente se identifica por `agentId` + um token de provisionamento (a im
 - Mensagens:
   - `binary`: payload do frame (JPEG/WebP)
   - `json`: metadados opcionais, ex. `{ "type": "meta", "width": 1280, "height": 720 }`
-
+Ajustes 
 ### Consumo de frames (webapp -> API)
 - WebSocket: `ws://API/ws/supervisor/preview?deviceId=...`
 - Auth: header `Authorization: Bearer <jwt>`
