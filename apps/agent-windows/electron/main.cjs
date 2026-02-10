@@ -66,12 +66,23 @@ function createWindow(showConfig = true) {
     if (showConfig) win.show();
   });
 
+  win.on("close", (e) => {
+    if (app.isQuitting || !tray) {
+      mainWindow = null;
+      return;
+    }
+    e.preventDefault();
+    win.hide();
+  });
+
   win.on("closed", () => {
     mainWindow = null;
   });
 
   return win;
 }
+
+const { Menu } = require("electron");
 
 function createTray() {
   const iconPath = path.join(__dirname, "tray-icon.png");
@@ -80,7 +91,7 @@ function createTray() {
     const icon = nativeImage.createFromPath(iconPath);
     if (icon.isEmpty()) return;
     tray = new Tray(icon);
-    tray.setToolTip("Agente de Monitoramento");
+    tray.setToolTip("Agente de Monitoramento — clique para abrir");
     tray.on("click", () => {
       if (mainWindow) {
         mainWindow.show();
@@ -88,6 +99,15 @@ function createTray() {
       } else {
         mainWindow = createWindow(true);
       }
+    });
+    tray.on("right-click", () => {
+      const menu = Menu.buildFromTemplate([
+        { label: "Abrir", click: () => { if (mainWindow) mainWindow.show(); else mainWindow = createWindow(true); } },
+        { type: "separator" },
+        { label: "Sair", click: () => { app.isQuitting = true; app.quit(); } },
+      ]);
+      tray.setContextMenu(menu);
+      tray.popUpContextMenu();
     });
   } catch (_) {}
 }
@@ -101,7 +121,10 @@ function writeLogLine(logFilePath, line) {
 }
 
 function startAgent(config) {
-  if (agentRunning) return Promise.resolve();
+  if (agentRunning) {
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send("agent:started");
+    return Promise.resolve();
+  }
   agentRunning = true;
 
   const logFilePath = path.join(app.getPath("userData"), "agent-log.txt");
@@ -170,6 +193,7 @@ function setupAutoUpdater() {
 }
 
 app.whenReady().then(() => {
+  app.isQuitting = false;
   setupAutoUpdater();
 
   ipcMain.handle("config:load", () => ({ config: loadConfig(), agentRunning }));
