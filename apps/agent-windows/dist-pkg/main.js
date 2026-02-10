@@ -121,13 +121,15 @@ async function run(screenshot, config) {
         });
         sendFrames();
     }
+    const REGISTER_RETRY_MS = 15_000; // 15s entre tentativas (ex.: esperar VPN)
     log(`Agente de monitoramento — ${cfg.AGENT_ID} ${cfg.HOSTNAME}`);
     log(`API: ${cfg.API_URL} | Preview: ${cfg.FPS} fps`);
-    const ok = await register();
-    if (!ok) {
-        const msg = "Não foi possível registrar o dispositivo na API. Verifique a URL da API, o segredo e se a API está rodando.";
-        log(`ERRO: ${msg}`);
-        throw new Error(msg);
+    for (;;) {
+        const ok = await register();
+        if (ok)
+            break;
+        log(`Não foi possível registrar. Tentando novamente em ${REGISTER_RETRY_MS / 1000}s… (conecte a VPN se necessário)`);
+        await new Promise((r) => setTimeout(r, REGISTER_RETRY_MS));
     }
     function connectAndRun() {
         const ws = connectPreview();

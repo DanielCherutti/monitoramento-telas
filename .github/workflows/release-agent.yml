@@ -1,0 +1,66 @@
+# Build do agente Windows e publicação como Release no GitHub.
+# Para publicar uma nova versão: crie uma tag (ex.: v1.0.1) e faça push.
+# Ex.: git tag v1.0.1 && git push origin v1.0.1
+name: Release Agente Windows
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Versão a partir da tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $env:GITHUB_OUTPUT
+
+      - name: Ajustar version no package.json do agente
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $path = "apps/agent-windows/package.json"
+          $pkg = Get-Content $path -Raw | ConvertFrom-Json
+          $pkg.version = $version
+          $pkg | ConvertTo-Json -Depth 100 | Set-Content $path
+
+      - name: Instalar dependências (raiz)
+        run: npm ci
+
+      - name: Build do agente (exe)
+        run: npm run build:exe --workspace=@monitoramento/agent-windows
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Encontrar artefato .exe
+        id: artifact
+        run: |
+          $exe = Get-ChildItem -Path "apps/agent-windows/dist" -Filter "*.exe" -Recurse | Select-Object -First 1
+          if (-not $exe) { Write-Error "Nenhum .exe encontrado em apps/agent-windows/dist" }
+          echo "PATH=$($exe.FullName)" >> $env:GITHUB_OUTPUT
+          echo "NAME=$($exe.Name)" >> $env:GITHUB_OUTPUT
+
+      - name: Criar Release e enviar .exe
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Agente Windows ${{ steps.version.outputs.VERSION }}
+          body: |
+            Atualização automática do agente de monitoramento.
+            Baixe **${{ steps.artifact.outputs.NAME }}** e execute. O agente instalado verificará atualizações pelo GitHub.
+          files: ${{ steps.artifact.outputs.PATH }}
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

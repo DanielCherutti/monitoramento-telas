@@ -265,10 +265,12 @@
   </div>
 
   <div class="footer">
-    As configurações são salvas localmente e usadas na próxima execução.
+    As configurações são salvas localmente. O agente tenta conectar a cada 15 s até a API estar acessível (ex.: após conectar a VPN).
     <br />
     <button type="button" class="btn btn-secondary" id="btnLog" style="margin-top: 10px; font-size: 0.8rem;">Abrir pasta do log (diagnóstico)</button>
+    <button type="button" class="btn btn-secondary" id="btnUpdate" style="margin-top: 10px; margin-left: 8px; font-size: 0.8rem;">Verificar atualizações</button>
     <div id="logPathHint" style="margin-top: 6px; font-size: 0.7rem; color: var(--text-muted); word-break: break-all;"></div>
+    <div id="updateStatus" style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted); display: none;"></div>
   </div>
 
   <script>
@@ -307,9 +309,21 @@
       if (form.screenCount) form.screenCount.value = config.screenCount != null ? String(config.screenCount) : "";
     }
 
+    function setStatusFromAgent(running) {
+      if (running) {
+        showStatus("Conectado ao servidor. Agente em execução.", "success");
+      } else {
+        showStatus("Conectando ao servidor… Se a VPN estiver desconectada, o agente tentará a cada 15 s até conectar.", "loading");
+      }
+    }
+
     if (window.agentApi) {
-      window.agentApi.onConfigLoaded((config) => setFormData(config));
+      window.agentApi.onConfigLoaded((config, agentRunning) => {
+        setFormData(config);
+        if (config && config.apiUrl) setStatusFromAgent(agentRunning);
+      });
       window.agentApi.onAgentStarted(() => {
+        showStatus("Conectado ao servidor. Agente em execução.", "success");
         btnSave.disabled = false;
         if (window.agentApi.minimizeToTray) window.agentApi.minimizeToTray();
       });
@@ -317,9 +331,18 @@
         showStatus(message, "error");
         btnSave.disabled = false;
       });
+      window.agentApi.onAgentStatus?.((running) => {
+        if (running) showStatus("Conectado ao servidor. Agente em execução.", "success");
+        else hideStatus();
+      });
 
-      window.agentApi.loadConfig().then((config) => {
-        if (config) setFormData(config);
+      window.agentApi.loadConfig().then((result) => {
+        const config = result && result.config ? result.config : result;
+        const agentRunning = result && typeof result.agentRunning === "boolean" ? result.agentRunning : false;
+        if (config) {
+          setFormData(config);
+          if (config.apiUrl) setStatusFromAgent(agentRunning);
+        }
       });
     }
 
@@ -372,6 +395,28 @@
         });
       }
     }
+
+    const btnUpdate = document.getElementById("btnUpdate");
+    const updateStatus = document.getElementById("updateStatus");
+    if (btnUpdate && window.agentApi && window.agentApi.checkForUpdates) {
+      btnUpdate.addEventListener("click", async () => {
+        updateStatus.style.display = "block";
+        updateStatus.style.color = "var(--accent)";
+        updateStatus.textContent = "Verificando atualizações…";
+        try {
+          await window.agentApi.checkForUpdates();
+          updateStatus.textContent = "Verificação concluída. Se houver nova versão, você será avisado.";
+          updateStatus.style.color = "var(--text-muted)";
+        } catch (e) {
+          updateStatus.textContent = "Não foi possível verificar (use a versão instalada para atualizar pelo GitHub).";
+          updateStatus.style.color = "var(--error)";
+        }
+      });
+      window.agentApi.onUpdateAvailable?.((version) => {
+        updateStatus.textContent = "Nova versão " + version + " disponível, baixando…";
+        updateStatus.style.color = "var(--success)";
+      });
+    } else if (btnUpdate) btnUpdate.style.display = "none";
 
     btnTest.addEventListener("click", async () => {
       const apiUrl = form.apiUrl.value.trim();

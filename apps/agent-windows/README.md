@@ -40,6 +40,8 @@ Serão criados em **`dist/`**:
 
 **Onde fica a configuração:** em `%APPDATA%/monitoramento-agent/config.json`. Para “reinstalar do zero”, apague essa pasta e abra o .exe de novo.
 
+**Atualização automática:** o .exe verifica atualizações no [GitHub Releases](https://github.com/DanielCherutti/monitoramento-telas/releases). Ao abrir ou a cada 4 h ele consulta nova versão; se houver, baixa e oferece reiniciar. Use o botão **Verificar atualizações** na janela de configuração.
+
 ### 2. Duplo clique no .bat (Node instalado no PC)
 
 1. Copie a pasta **`apps/agent-windows`** inteira para o PC (com `node_modules` e `dist` já gerados, ou só o código).

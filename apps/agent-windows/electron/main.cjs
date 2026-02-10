@@ -1,9 +1,18 @@
 "use strict";
 
-const { app, BrowserWindow, ipcMain, Tray, nativeImage, shell } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, nativeImage, shell, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const WebSocket = require("ws");
+
+let autoUpdater = null;
+if (app.isPackaged) {
+  try {
+    autoUpdater = require("electron-updater").autoUpdater;
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
+  } catch (_) {}
+}
 
 const CONFIG_PATH = path.join(app.getPath("userData"), "config.json");
 
@@ -96,7 +105,7 @@ function startAgent(config) {
   agentRunning = true;
 
   const logFilePath = path.join(app.getPath("userData"), "agent-log.txt");
-  writeLogLine(logFilePath, "[start] Iniciando agente...");
+  writeLogLine(logFilePath, "[start] Iniciando agente... (se a VPN estiver desconectada, o agente tentará a cada 15s até conectar)");
 
   let screenshot;
   try {
@@ -133,11 +142,47 @@ function startAgent(config) {
   });
 }
 
+function setupAutoUpdater() {
+  if (!autoUpdater) return;
+  autoUpdater.on("update-available", (info) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("update:available", info.version);
+    }
+  });
+  autoUpdater.on("update-downloaded", async (info) => {
+    const { response } = await dialog.showMessageBox(mainWindow && !mainWindow.isDestroyed() ? mainWindow : null, {
+      type: "info",
+      title: "Atualização disponível",
+      message: `A versão ${info.version} foi baixada. Reiniciar o agente agora para aplicar?`,
+      buttons: ["Reiniciar agora", "Depois"],
+      defaultId: 0,
+    });
+    if (response === 0) autoUpdater.quitAndInstall(false, true);
+  });
+  autoUpdater.on("error", (err) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("update:error", err.message);
+    }
+  });
+  // Verificação inicial após 10s e a cada 4h
+  setTimeout(() => autoUpdater.checkForUpdates().catch(() => {}), 10_000);
+  setInterval(() => autoUpdater.checkForUpdates().catch(() => {}), 4 * 60 * 60 * 1000);
+}
+
 app.whenReady().then(() => {
-  ipcMain.handle("config:load", () => loadConfig());
+  setupAutoUpdater();
+
+  ipcMain.handle("config:load", () => ({ config: loadConfig(), agentRunning }));
   ipcMain.handle("config:save", (_event, config) => {
     saveConfig(config);
     return true;
+  });
+  ipcMain.handle("update:check", () => {
+    if (autoUpdater) return autoUpdater.checkForUpdates().catch(() => ({}));
+    return Promise.resolve({});
+  });
+  ipcMain.handle("update:quitAndInstall", () => {
+    if (autoUpdater) autoUpdater.quitAndInstall(false, true);
   });
   ipcMain.handle("agent:start", async (_event, config) => {
     await startAgent(config);
@@ -188,9 +233,15 @@ app.whenReady().then(() => {
   const config = loadConfig();
   mainWindow = createWindow(true);
 
+  mainWindow.on("show", () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("agent:status", agentRunning);
+    }
+  });
+
   if (config) {
     mainWindow.webContents.once("did-finish-load", () => {
-      mainWindow.webContents.send("config:loaded", config);
+      mainWindow.webContents.send("config:loaded", config, agentRunning);
     });
     startAgent(config).then(() => {
       if (mainWindow) mainWindow.webContents.send("agent:started");

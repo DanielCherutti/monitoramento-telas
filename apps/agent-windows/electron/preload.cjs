@@ -11,7 +11,7 @@ contextBridge.exposeInMainWorld("agentApi", {
   openLogFolder: () => ipcRenderer.invoke("shell:openLogFolder"),
   testConnection: (apiUrl, agentId) => ipcRenderer.invoke("connection:test", { apiUrl, agentId }),
   onConfigLoaded: (fn) => {
-    ipcRenderer.on("config:loaded", (_event, config) => fn(config));
+    ipcRenderer.on("config:loaded", (_event, config, agentRunning) => fn(config, agentRunning));
   },
   onAgentStarted: (fn) => {
     ipcRenderer.on("agent:started", () => fn());
@@ -19,4 +19,9 @@ contextBridge.exposeInMainWorld("agentApi", {
   onAgentError: (fn) => {
     ipcRenderer.on("agent:error", (_event, message) => fn(message));
   },
+  checkForUpdates: () => ipcRenderer.invoke("update:check"),
+  onUpdateAvailable: (fn) => ipcRenderer.on("update:available", (_event, version) => fn(version)),
+  onUpdateDownloaded: (fn) => ipcRenderer.on("update:downloaded", (_event, version) => fn(version)),
+  onUpdateError: (fn) => ipcRenderer.on("update:error", (_event, message) => fn(message)),
+  onAgentStatus: (fn) => ipcRenderer.on("agent:status", (_event, running) => fn(running)),
 });

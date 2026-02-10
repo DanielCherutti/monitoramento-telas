@@ -16,6 +16,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "electron-updater": "^6.3.9",
     "screenshot-desktop": "^1.15.0",
     "ws": "^8.18.0"
   },
@@ -31,9 +32,17 @@
     "appId": "com.monitoramento.agent",
     "productName": "Monitoramento de Telas - Agente",
     "electronVersion": "33.0.0",
-    "directories": { "output": "dist" },
-    "files": ["electron/**/*", "dist-pkg/**/*", "node_modules/**/*"],
-    "asarUnpack": ["node_modules/screenshot-desktop/**"],
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "dist-pkg/**/*",
+      "node_modules/**/*"
+    ],
+    "asarUnpack": [
+      "node_modules/screenshot-desktop/**"
+    ],
     "win": {
       "target": "portable",
       "signAndEditExecutable": false
@@ -44,6 +53,11 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "DanielCherutti",
+      "repo": "monitoramento-telas"
     }
   }
 }
