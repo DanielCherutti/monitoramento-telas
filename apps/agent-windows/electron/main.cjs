@@ -298,13 +298,8 @@ app.whenReady().then(() => {
       const newExePath = path.join(tempDir, "monitoramento-agent-new.exe");
       const downloadRes = await fetch(downloadUrl);
       if (!downloadRes.ok) return { ok: false, message: "Download falhou (HTTP " + downloadRes.status + ")." };
-      const out = fs.createWriteStream(newExePath);
-      await new Promise((resolve, reject) => {
-        downloadRes.body.pipe(out);
-        out.on("finish", () => { out.close(); resolve(); });
-        out.on("error", reject);
-        downloadRes.body.on("error", reject);
-      });
+      const buffer = Buffer.from(await downloadRes.arrayBuffer());
+      fs.writeFileSync(newExePath, buffer);
 
       const currentExe = process.execPath;
       const batPath = path.join(tempDir, "monitoramento-agent-update.bat");
@@ -317,8 +312,21 @@ app.whenReady().then(() => {
         "del \"%~f0\"\r\n";
       fs.writeFileSync(batPath, batContent, "utf8");
 
-      spawn("cmd.exe", ["/c", batPath], { detached: true, stdio: "ignore", windowsHide: true }).unref();
-      setImmediate(() => app.quit());
+      // Executa o .bat em processo separado (start /b) para não ser encerrado quando o app sair
+      spawn("cmd.exe", ["/c", "start", "/b", "", batPath], { detached: true, stdio: "ignore", windowsHide: true }).unref();
+
+      // Dá tempo do .bat iniciar; depois fecha tray e janela para o app sair de verdade
+      setTimeout(() => {
+        if (tray) {
+          try { tray.destroy(); } catch (_) {}
+          tray = null;
+        }
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.destroy();
+          mainWindow = null;
+        }
+        app.exit(0);
+      }, 1500);
       return { ok: true };
     } catch (e) {
       return { ok: false, message: (e && e.message) || "Erro ao baixar ou preparar atualização." };
