@@ -349,6 +349,7 @@
       </button>
     </div>
     <div>
+      <div id="appVersion" style="font-size: 10px; color: var(--muted); margin-bottom: 2px;"></div>
       <div id="logPathHint"></div>
       <div id="updateStatus"></div>
     </div>
@@ -500,6 +501,12 @@
 
     const btnUpdate = document.getElementById("btnUpdate");
     const updateStatus = document.getElementById("updateStatus");
+    const appVersionEl = document.getElementById("appVersion");
+    if (window.agentApi?.getAppVersion) {
+      window.agentApi.getAppVersion().then(function(v) {
+        if (appVersionEl && v) appVersionEl.textContent = "Versão " + v;
+      }).catch(function() {});
+    }
     if (btnUpdate && window.agentApi?.checkForUpdates) {
       btnUpdate.addEventListener("click", async () => {
         updateStatus.style.display = "block";
@@ -511,7 +518,8 @@
             updateStatus.textContent = "v" + result.version + " disponível.";
             updateStatus.style.color = "var(--online)";
           } else {
-            updateStatus.textContent = "Versão mais recente.";
+            const v = result?.currentVersion || "";
+            updateStatus.textContent = v ? "Você está na v" + v + " (mais recente)." : "Versão mais recente.";
             updateStatus.style.color = "var(--muted)";
           }
         } catch (e) {
@@ -524,7 +532,9 @@
         updateStatus.style.color = "var(--online)";
       });
       window.agentApi.onUpdateNotAvailable?.(() => {
-        updateStatus.textContent = "Versão mais recente.";
+        window.agentApi.getAppVersion().then(function(cur) {
+          updateStatus.textContent = cur ? "Você está na v" + cur + " (mais recente)." : "Versão mais recente.";
+        }).catch(function() { updateStatus.textContent = "Versão mais recente."; });
         updateStatus.style.color = "var(--muted)";
       });
     } else if (btnUpdate) btnUpdate.style.display = "none";

@@ -40,7 +40,7 @@ Serão criados em **`dist/`**:
 
 **Onde fica a configuração:** em `%APPDATA%/monitoramento-agent/config.json`. Para “reinstalar do zero”, apague essa pasta e abra o .exe de novo.
 
-**Atualização automática:** o .exe verifica atualizações no [GitHub Releases](https://github.com/DanielCherutti/monitoramento-telas/releases). Ao abrir ou a cada 4 h ele consulta nova versão; se houver, baixa e oferece reiniciar. Use o botão **Verificar atualizações** na janela de configuração.
+**Atualização automática:** o .exe verifica atualizações no [GitHub Releases](https://github.com/DanielCherutti/monitoramento-telas/releases). Ao abrir ou a cada 4 h ele consulta nova versão; se houver, baixa e oferece reiniciar. Use o botão **Verificar atualizações** na janela de configuração. Ao publicar uma release manualmente, anexe o executável com o nome **`monitoramento-agent.exe`** para o atualizador reconhecer (e não marque como "Pre-release" se quiser que todos recebam).
 
 ### 2. Duplo clique no .bat (Node instalado no PC)
 

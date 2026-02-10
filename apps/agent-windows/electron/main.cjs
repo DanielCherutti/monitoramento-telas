@@ -232,15 +232,17 @@ app.whenReady().then(() => {
     return true;
   });
   ipcMain.handle("update:check", async () => {
-    if (!autoUpdater) return { hasUpdate: false };
+    const currentVersion = app.getVersion();
+    if (!autoUpdater) return { hasUpdate: false, currentVersion };
     try {
       const result = await autoUpdater.checkForUpdates();
       const version = result?.updateInfo?.version;
-      return { hasUpdate: !!version, version: version || null };
+      return { hasUpdate: !!version, version: version || null, currentVersion };
     } catch (_) {
-      return { hasUpdate: false };
+      return { hasUpdate: false, currentVersion };
     }
   });
+  ipcMain.handle("app:version", () => app.getVersion());
   ipcMain.handle("update:quitAndInstall", () => {
     if (autoUpdater) autoUpdater.quitAndInstall(false, true);
   });
