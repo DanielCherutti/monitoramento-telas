@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld("agentApi", {
   },
   checkForUpdates: () => ipcRenderer.invoke("update:check"),
   getAppVersion: () => ipcRenderer.invoke("app:version"),
+  getGithubLatestRelease: () => ipcRenderer.invoke("github:latest-release"),
   onUpdateAvailable: (fn) => ipcRenderer.on("update:available", (_event, version) => fn(version)),
   onUpdateDownloaded: (fn) => ipcRenderer.on("update:downloaded", (_event, version) => fn(version)),
   onUpdateError: (fn) => ipcRenderer.on("update:error", (_event, message) => fn(message)),

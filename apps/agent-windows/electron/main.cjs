@@ -243,6 +243,21 @@ app.whenReady().then(() => {
     }
   });
   ipcMain.handle("app:version", () => app.getVersion());
+
+  ipcMain.handle("github:latest-release", async () => {
+    try {
+      const res = await fetch("https://api.github.com/repos/DanielCherutti/monitoramento-telas/releases/latest", {
+        headers: { Accept: "application/vnd.github.v3+json" },
+      });
+      if (!res.ok) return { tag: null, error: res.status };
+      const data = await res.json();
+      const tag = data.tag_name || null;
+      const assets = (data.assets || []).map((a) => a.name);
+      return { tag, assets };
+    } catch (e) {
+      return { tag: null, error: (e && e.message) || "erro" };
+    }
+  });
   ipcMain.handle("update:quitAndInstall", () => {
     if (autoUpdater) autoUpdater.quitAndInstall(false, true);
   });

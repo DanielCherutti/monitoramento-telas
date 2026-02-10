@@ -254,7 +254,7 @@
     .foot-links button:hover { color: var(--text); }
     .foot-links button svg { width: 13px; height: 13px; opacity: 0.9; }
 
-    #logPathHint, #updateStatus {
+    #logPathHint {
       font-size: 10px;
       color: var(--muted);
       max-width: 160px;
@@ -263,7 +263,14 @@
       white-space: nowrap;
     }
 
-    #updateStatus { display: none; }
+    #updateStatus {
+      font-size: 10px;
+      color: var(--muted);
+      max-width: 100%;
+      white-space: normal;
+      word-break: break-word;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -514,12 +521,26 @@
         updateStatus.textContent = "Verificando…";
         try {
           const result = await window.agentApi.checkForUpdates();
+          let gh = null;
+          if (window.agentApi?.getGithubLatestRelease) {
+            try { gh = await window.agentApi.getGithubLatestRelease(); } catch (_) {}
+          }
           if (result?.hasUpdate && result?.version) {
             updateStatus.textContent = "v" + result.version + " disponível.";
             updateStatus.style.color = "var(--online)";
           } else {
             const v = result?.currentVersion || "";
-            updateStatus.textContent = v ? "Você está na v" + v + " (mais recente)." : "Versão mais recente.";
+            let msg = v ? "Você está na v" + v + " (mais recente)." : "Versão mais recente.";
+            if (gh?.tag) {
+              msg += " No GitHub: " + gh.tag;
+              if (gh.assets?.length) msg += " — arquivos: " + gh.assets.join(", ");
+              if (!result?.hasUpdate && v && gh.tag.replace(/^v/, "") !== v) {
+                msg += ". Há versão nova no GitHub; se não atualizou, o asset deve se chamar monitoramento-agent.exe.";
+              }
+            } else if (gh?.error) {
+              msg += " (GitHub: " + (gh.error === 404 ? "nenhuma release latest" : "erro " + gh.error) + ")";
+            }
+            updateStatus.textContent = msg;
             updateStatus.style.color = "var(--muted)";
           }
         } catch (e) {
