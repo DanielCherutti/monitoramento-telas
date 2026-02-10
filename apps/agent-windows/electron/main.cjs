@@ -206,6 +206,11 @@ function setupAutoUpdater() {
     });
     if (response === 0) autoUpdater.quitAndInstall(false, true);
   });
+  autoUpdater.on("update-not-available", () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("update:not-available");
+    }
+  });
   autoUpdater.on("error", (err) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send("update:error", err.message);
@@ -225,9 +230,15 @@ app.whenReady().then(() => {
     saveConfig(config);
     return true;
   });
-  ipcMain.handle("update:check", () => {
-    if (autoUpdater) return autoUpdater.checkForUpdates().catch(() => ({}));
-    return Promise.resolve({});
+  ipcMain.handle("update:check", async () => {
+    if (!autoUpdater) return { hasUpdate: false };
+    try {
+      const result = await autoUpdater.checkForUpdates();
+      const version = result?.updateInfo?.version;
+      return { hasUpdate: !!version, version: version || null };
+    } catch (_) {
+      return { hasUpdate: false };
+    }
   });
   ipcMain.handle("update:quitAndInstall", () => {
     if (autoUpdater) autoUpdater.quitAndInstall(false, true);

@@ -23,5 +23,6 @@ contextBridge.exposeInMainWorld("agentApi", {
   onUpdateAvailable: (fn) => ipcRenderer.on("update:available", (_event, version) => fn(version)),
   onUpdateDownloaded: (fn) => ipcRenderer.on("update:downloaded", (_event, version) => fn(version)),
   onUpdateError: (fn) => ipcRenderer.on("update:error", (_event, message) => fn(message)),
+  onUpdateNotAvailable: (fn) => ipcRenderer.on("update:not-available", () => fn()),
   onAgentStatus: (fn) => ipcRenderer.on("agent:status", (_event, running) => fn(running)),
 });

@@ -3,252 +3,255 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Monitoramento de Telas — Configuração</title>
+  <title>Monitoramento de Telas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0c0c0e;
-      --surface: #141416;
-      --border: rgba(255,255,255,0.06);
-      --text: #fafafa;
-      --text-muted: #71717a;
+      --bg: #09090b;
+      --panel: #0f0f11;
+      --muted: #52525b;
+      --text: #f4f4f5;
       --accent: #3b82f6;
       --accent-hover: #2563eb;
-      --success: #10b981;
-      --error: #f43f5e;
-      --radius: 10px;
-      --radius-sm: 6px;
+      --ok: #22c55e;
+      --err: #ef4444;
+      --radius: 8px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Inter", system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 32px 28px 24px;
-      font-size: 14px;
+      padding: 0;
+      font-size: 13px;
       -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
     }
 
-    .header {
-      margin-bottom: 32px;
+    .top {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 
-    .header h1 {
-      font-size: 1.25rem;
+    .top h1 {
+      font-size: 1.1rem;
       font-weight: 600;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
       color: var(--text);
     }
 
-    .header p {
-      margin-top: 4px;
-      font-size: 13px;
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .field label {
+    .top p {
+      margin-top: 2px;
       font-size: 12px;
-      font-weight: 500;
-      color: var(--text-muted);
-      letter-spacing: 0.01em;
+      color: var(--muted);
     }
 
-    .field input {
+    .scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+
+    .block {
+      margin-bottom: 20px;
+    }
+
+    .block:last-of-type { margin-bottom: 0; }
+
+    .label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    input[type="url"],
+    input[type="text"],
+    input[type="password"],
+    input[type="number"] {
       width: 100%;
       padding: 10px 12px;
-      font-size: 14px;
-      font-family: inherit;
-      color: var(--text);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .field input::placeholder {
-      color: var(--text-muted);
-      opacity: 0.7;
-    }
-
-    .field input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-    }
-
-    .field .hint {
-      font-size: 11px;
-      color: var(--text-muted);
-      opacity: 0.9;
-    }
-
-    .row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 10px 16px;
       font-size: 13px;
-      font-weight: 500;
       font-family: inherit;
-      border: none;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: background 0.15s, opacity 0.15s;
-    }
-
-    .btn:active { opacity: 0.9; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .btn-primary {
-      background: var(--accent);
-      color: white;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: var(--accent-hover);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-muted);
-    }
-
-    .btn-ghost:hover {
       color: var(--text);
-      background: rgba(255,255,255,0.04);
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
+
+    input::placeholder { color: var(--muted); opacity: 0.8; }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+    }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .opt {
+      padding-top: 16px;
+      margin-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .opt .label { color: var(--muted); opacity: 0.9; }
 
     .status {
-      margin-top: 4px;
       padding: 10px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
+      border-radius: var(--radius);
+      font-size: 12px;
       display: none;
+      margin-bottom: 12px;
     }
 
     .status.show { display: block; }
 
-    .status.success {
-      background: rgba(16, 185, 129, 0.12);
-      color: var(--success);
-    }
+    .status.success { background: rgba(34, 197, 94, 0.12); color: var(--ok); }
+    .status.error   { background: rgba(239, 68, 68, 0.12); color: var(--err); }
+    .status.loading { background: rgba(59, 130, 246, 0.1);  color: var(--accent); }
 
-    .status.error {
-      background: rgba(244, 63, 94, 0.12);
-      color: var(--error);
-    }
-
-    .status.loading {
-      background: rgba(59, 130, 246, 0.1);
-      color: var(--accent);
-    }
-
-    .footer {
-      margin-top: 28px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .footer-actions {
+    .actions {
       display: flex;
-      gap: 8px;
+      align-items: center;
+      gap: 12px;
       flex-wrap: wrap;
-      margin-top: 12px;
+      margin-top: 20px;
     }
 
-    .footer-actions .btn {
-      padding: 6px 12px;
-      font-size: 12px;
+    .btn {
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: opacity 0.15s, background 0.15s;
     }
+
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn:active:not(:disabled) { opacity: 0.9; }
+
+    .btn-main {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-main:hover:not(:disabled) { background: var(--accent-hover); }
+
+    .btn-link {
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 0;
+    }
+
+    .btn-link:hover { color: var(--text); }
+
+    .bottom {
+      padding: 16px 24px 20px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .bottom-links {
+      display: flex;
+      gap: 16px;
+    }
+
+    .bottom-links button {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .bottom-links button:hover { color: var(--text); }
 
     #logPathHint, #updateStatus {
-      margin-top: 8px;
       font-size: 11px;
+      color: var(--muted);
       word-break: break-all;
+      margin-top: 4px;
     }
 
     #updateStatus { display: none; }
   </style>
 </head>
 <body>
-  <header class="header">
+  <div class="top">
     <h1>Monitoramento de Telas</h1>
-    <p>Conecte este computador ao servidor</p>
-  </header>
+    <p>Conecte este PC ao servidor</p>
+  </div>
 
-  <form id="form">
-    <div class="field">
-      <label for="apiUrl">URL da API</label>
-      <input type="url" id="apiUrl" name="apiUrl" placeholder="http://192.168.4.90:4001" required />
-      <span class="hint">Endereço do servidor (ex.: http://IP:4001)</span>
+  <div class="scroll">
+    <form id="form">
+      <div class="block">
+        <label class="label" for="apiUrl">URL da API</label>
+        <input type="url" id="apiUrl" name="apiUrl" placeholder="http://192.168.4.90:4001" required />
+      </div>
+
+      <div class="row2">
+        <div class="block">
+          <label class="label" for="agentId">ID do agente</label>
+          <input type="text" id="agentId" name="agentId" placeholder="Opcional" />
+        </div>
+        <div class="block">
+          <label class="label" for="hostname">Nome no dashboard</label>
+          <input type="text" id="hostname" name="hostname" placeholder="Opcional" />
+        </div>
+      </div>
+
+      <div class="block">
+        <label class="label" for="registrationSecret">Segredo</label>
+        <input type="password" id="registrationSecret" name="registrationSecret" placeholder="••••••••" />
+      </div>
+
+      <div class="block opt">
+        <label class="label" for="screenCount">Telas</label>
+        <input type="number" id="screenCount" name="screenCount" min="1" max="8" placeholder="1 = automático" />
+      </div>
+
+      <div class="status" id="status"></div>
+      <div class="status" id="testResult"></div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-main" id="btnSave">Salvar e iniciar</button>
+        <button type="button" class="btn btn-link" id="btnReconfig">Reconfigurar</button>
+        <button type="button" class="btn btn-link" id="btnTest">Testar</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="bottom">
+    <div class="bottom-links">
+      <button type="button" id="btnLog">Log</button>
+      <button type="button" id="btnUpdate">Atualizações</button>
     </div>
-
-    <div class="field">
-      <label for="agentId">ID do agente</label>
-      <input type="text" id="agentId" name="agentId" placeholder="PC-SALA-01" />
-      <span class="hint">Opcional — usa o nome do PC se vazio</span>
+    <div>
+      <div id="logPathHint"></div>
+      <div id="updateStatus"></div>
     </div>
-
-    <div class="field">
-      <label for="hostname">Nome exibido</label>
-      <input type="text" id="hostname" name="hostname" placeholder="Sala Reuniões" />
-      <span class="hint">Opcional — nome no dashboard</span>
-    </div>
-
-    <div class="field">
-      <label for="registrationSecret">Segredo de registro</label>
-      <input type="password" id="registrationSecret" name="registrationSecret" placeholder="••••••••" />
-      <span class="hint">Mesmo valor configurado na API</span>
-    </div>
-
-    <div class="field">
-      <label for="screenCount">Número de telas</label>
-      <input type="number" id="screenCount" name="screenCount" min="1" max="8" placeholder="1 (automático)" />
-      <span class="hint">Opcional — use 2+ se tiver vários monitores</span>
-    </div>
-
-    <div class="status" id="status"></div>
-    <div class="status" id="testResult"></div>
-
-    <div class="row" style="margin-top: 4px;">
-      <button type="submit" class="btn btn-primary" id="btnSave">Salvar e iniciar</button>
-      <button type="button" class="btn btn-ghost" id="btnReconfig">Reconfigurar</button>
-      <button type="button" class="btn btn-ghost" id="btnTest">Testar conexão</button>
-    </div>
-  </form>
-
-  <footer class="footer">
-    <p>Configuração salva localmente. O agente tenta conectar a cada 15 s até a API estar acessível.</p>
-    <div class="footer-actions">
-      <button type="button" class="btn btn-ghost" id="btnLog">Abrir pasta do log</button>
-      <button type="button" class="btn btn-ghost" id="btnUpdate">Verificar atualizações</button>
-    </div>
-    <div id="logPathHint"></div>
-    <div id="updateStatus"></div>
-  </footer>
+  </div>
 
   <script>
     const form = document.getElementById("form");
@@ -287,11 +290,8 @@
     }
 
     function setStatusFromAgent(running) {
-      if (running) {
-        showStatus("Conectado. Agente em execução.", "success");
-      } else {
-        showStatus("Conectando… Se a VPN estiver desconectada, o agente tentará a cada 15 s.", "loading");
-      }
+      if (running) showStatus("Conectado. Agente em execução.", "success");
+      else showStatus("Conectando… Tentando a cada 15 s se a VPN estiver fora.", "loading");
     }
 
     if (window.agentApi) {
@@ -312,9 +312,8 @@
         if (running) showStatus("Conectado. Agente em execução.", "success");
         else hideStatus();
       });
-
       window.agentApi.loadConfig().then((result) => {
-        const config = result && result.config ? result.config : result;
+        const config = result?.config ?? result;
         const agentRunning = result && typeof result.agentRunning === "boolean" ? result.agentRunning : false;
         if (config) {
           setFormData(config);
@@ -333,14 +332,13 @@
       hideStatus();
       btnSave.disabled = true;
       showStatus("Salvando e conectando…", "loading");
-
       try {
         if (window.agentApi) {
           await window.agentApi.saveConfig(config);
           await window.agentApi.startAgent(config);
         }
       } catch (err) {
-        showStatus(err.message || "Erro ao iniciar o agente.", "error");
+        showStatus(err?.message || "Erro ao iniciar.", "error");
         btnSave.disabled = false;
       }
     });
@@ -361,59 +359,52 @@
     const btnLog = document.getElementById("btnLog");
     const logPathHint = document.getElementById("logPathHint");
     if (btnLog && window.agentApi) {
-      if (window.agentApi.getLogPath) {
-        window.agentApi.getLogPath().then((p) => {
-          if (logPathHint && p) logPathHint.textContent = p;
-        }).catch(() => {});
-      }
-      if (window.agentApi.openLogFolder) {
-        btnLog.addEventListener("click", () => window.agentApi.openLogFolder());
-      }
+      window.agentApi.getLogPath?.().then((p) => { if (logPathHint && p) logPathHint.textContent = p; }).catch(() => {});
+      window.agentApi.openLogFolder && btnLog.addEventListener("click", () => window.agentApi.openLogFolder());
     }
 
     const btnUpdate = document.getElementById("btnUpdate");
     const updateStatus = document.getElementById("updateStatus");
-    if (btnUpdate && window.agentApi && window.agentApi.checkForUpdates) {
+    if (btnUpdate && window.agentApi?.checkForUpdates) {
       btnUpdate.addEventListener("click", async () => {
         updateStatus.style.display = "block";
         updateStatus.style.color = "var(--accent)";
         updateStatus.textContent = "Verificando…";
         try {
-          await window.agentApi.checkForUpdates();
-          updateStatus.textContent = "Verificação concluída.";
-          updateStatus.style.color = "var(--text-muted)";
+          const result = await window.agentApi.checkForUpdates();
+          if (result?.hasUpdate && result?.version) {
+            updateStatus.textContent = "Nova versão " + result.version + " disponível. Baixando…";
+            updateStatus.style.color = "var(--ok)";
+          } else {
+            updateStatus.textContent = "Você está na versão mais recente.";
+            updateStatus.style.color = "var(--muted)";
+          }
         } catch (e) {
           updateStatus.textContent = "Não foi possível verificar.";
-          updateStatus.style.color = "var(--error)";
+          updateStatus.style.color = "var(--err)";
         }
       });
-      window.agentApi.onUpdateAvailable?.((version) => {
-        updateStatus.textContent = "Nova versão " + version + " disponível, baixando…";
-        updateStatus.style.color = "var(--success)";
+      window.agentApi.onUpdateAvailable?.((v) => {
+        updateStatus.textContent = "Nova versão " + v + " disponível. Baixando…";
+        updateStatus.style.color = "var(--ok)";
+      });
+      window.agentApi.onUpdateNotAvailable?.(() => {
+        updateStatus.textContent = "Você está na versão mais recente.";
+        updateStatus.style.color = "var(--muted)";
       });
     } else if (btnUpdate) btnUpdate.style.display = "none";
 
     btnTest.addEventListener("click", async () => {
       const apiUrl = form.apiUrl.value.trim();
       const agentId = form.agentId.value.trim() || "TEST";
-      if (!apiUrl) {
-        showTestResult("Informe a URL da API.", "error");
-        return;
-      }
-      if (!window.agentApi?.testConnection) {
-        showTestResult("Teste não disponível nesta versão.", "error");
-        return;
-      }
-      showTestResult("Testando conexão…", "loading");
+      if (!apiUrl) { showTestResult("Informe a URL da API.", "error"); return; }
+      if (!window.agentApi?.testConnection) { showTestResult("Teste indisponível.", "error"); return; }
+      showTestResult("Testando…", "loading");
       try {
         const result = await window.agentApi.testConnection(apiUrl, agentId);
-        if (result?.ok) {
-          showTestResult(result.message || "Conexão OK.", "success");
-        } else {
-          showTestResult(result?.message || "Erro ao testar.", "error");
-        }
+        showTestResult(result?.ok ? (result.message || "Conexão OK.") : (result?.message || "Erro."), result?.ok ? "success" : "error");
       } catch (err) {
-        showTestResult(err?.message || "Erro ao testar.", "error");
+        showTestResult(err?.message || "Erro.", "error");
       }
     });
   </script>
