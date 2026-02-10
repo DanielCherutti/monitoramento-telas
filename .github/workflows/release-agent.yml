@@ -44,7 +44,7 @@ jobs:
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
 
-      - name: Encontrar artefatos (.exe portable e instalador NSIS)
+      - name: Encontrar artefato .exe
         id: artifacts
         run: |
           $dist = "apps/agent-windows/dist"
@@ -63,8 +63,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Agente Windows ${{ steps.version.outputs.VERSION }}
           body: |
-            **Portable:** baixe `monitoramento-agent.exe` e execute (sem instalação).
-            **Instalador (NSIS):** use o Setup para instalar; quem instala recebe atualizações automáticas pelo app.
+            Baixe **monitoramento-agent.exe**, copie para o PC e execute. Não é necessário instalar.
           files: ${{ steps.artifacts.outputs.PATHS }}
           draft: false
         env:

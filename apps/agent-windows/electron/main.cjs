@@ -3,6 +3,7 @@
 const { app, BrowserWindow, ipcMain, Tray, nativeImage, shell, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const { spawn } = require("child_process");
 const WebSocket = require("ws");
 
 let autoUpdater = null;
@@ -253,7 +254,10 @@ app.whenReady().then(() => {
       const data = await res.json();
       const tag = data.tag_name || null;
       const assets = (data.assets || []).map((a) => a.name);
-      return { tag, assets };
+      const releaseUrl = data.html_url || (tag ? `https://github.com/DanielCherutti/monitoramento-telas/releases/tag/${tag}` : null);
+      const assetExe = (data.assets || []).find((a) => a.name === "monitoramento-agent.exe");
+      const downloadUrl = assetExe ? assetExe.browser_download_url : null;
+      return { tag, assets, releaseUrl, downloadUrl };
     } catch (e) {
       return { tag: null, error: (e && e.message) || "erro" };
     }
@@ -271,6 +275,55 @@ app.whenReady().then(() => {
 
   ipcMain.handle("path:logFile", () => path.join(app.getPath("userData"), "agent-log.txt"));
   ipcMain.handle("shell:openLogFolder", () => shell.openPath(app.getPath("userData")));
+  ipcMain.handle("shell:openUrl", (_event, url) => {
+    if (url && typeof url === "string") shell.openExternal(url);
+  });
+
+  ipcMain.handle("update:downloadAndReplace", async () => {
+    if (!app.isPackaged) return { ok: false, message: "Só funciona no .exe instalado." };
+    try {
+      const res = await fetch("https://api.github.com/repos/DanielCherutti/monitoramento-telas/releases/latest", {
+        headers: { Accept: "application/vnd.github.v3+json" },
+      });
+      if (!res.ok) return { ok: false, message: "Não foi possível obter a release." };
+      const data = await res.json();
+      const assetExe = (data.assets || []).find((a) => a.name === "monitoramento-agent.exe");
+      if (!assetExe || !assetExe.browser_download_url) return { ok: false, message: "Asset monitoramento-agent.exe não encontrado na release." };
+      const downloadUrl = assetExe.browser_download_url;
+      const currentVersion = app.getVersion();
+      const tagVersion = (data.tag_name || "").replace(/^v/, "");
+      if (tagVersion === currentVersion) return { ok: false, message: "Já está na versão mais recente." };
+
+      const tempDir = app.getPath("temp");
+      const newExePath = path.join(tempDir, "monitoramento-agent-new.exe");
+      const downloadRes = await fetch(downloadUrl);
+      if (!downloadRes.ok) return { ok: false, message: "Download falhou (HTTP " + downloadRes.status + ")." };
+      const out = fs.createWriteStream(newExePath);
+      await new Promise((resolve, reject) => {
+        downloadRes.body.pipe(out);
+        out.on("finish", () => { out.close(); resolve(); });
+        out.on("error", reject);
+        downloadRes.body.on("error", reject);
+      });
+
+      const currentExe = process.execPath;
+      const batPath = path.join(tempDir, "monitoramento-agent-update.bat");
+      const batContent =
+        "@echo off\r\n" +
+        "timeout /t 2 /nobreak > nul\r\n" +
+        "copy /Y \"" + newExePath.replace(/\"/g, "\"\"") + "\" \"" + currentExe.replace(/\"/g, "\"\"") + "\"\r\n" +
+        "start \"\" \"" + currentExe.replace(/\"/g, "\"\"") + "\"\r\n" +
+        "del \"" + newExePath.replace(/\"/g, "\"\"") + "\"\r\n" +
+        "del \"%~f0\"\r\n";
+      fs.writeFileSync(batPath, batContent, "utf8");
+
+      spawn("cmd.exe", ["/c", batPath], { detached: true, stdio: "ignore", windowsHide: true }).unref();
+      setImmediate(() => app.quit());
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, message: (e && e.message) || "Erro ao baixar ou preparar atualização." };
+    }
+  });
 
   ipcMain.handle("connection:test", async (_event, { apiUrl, agentId }) => {
     const base = (apiUrl || "").trim().replace(/\/$/, "");

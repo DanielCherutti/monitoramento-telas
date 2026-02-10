@@ -44,16 +44,11 @@
       "node_modules/screenshot-desktop/**"
     ],
     "win": {
-      "target": ["portable", "nsis"],
+      "target": "portable",
       "signAndEditExecutable": false
     },
     "portable": {
       "artifactName": "monitoramento-agent.exe"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "unicode": true
     },
     "publish": {
       "provider": "github",

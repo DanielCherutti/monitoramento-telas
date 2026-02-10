@@ -254,6 +254,17 @@
     .foot-links button:hover { color: var(--text); }
     .foot-links button svg { width: 13px; height: 13px; opacity: 0.9; }
 
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0;
+      text-decoration: underline;
+    }
+    .link-btn:hover { color: var(--accent-hover); }
+
     #logPathHint {
       font-size: 10px;
       color: var(--muted);
@@ -359,6 +370,14 @@
       <div id="appVersion" style="font-size: 10px; color: var(--muted); margin-bottom: 2px;"></div>
       <div id="logPathHint"></div>
       <div id="updateStatus"></div>
+      <div id="updateActions" style="display: none; margin-top: 6px; gap: 8px; flex-wrap: wrap;">
+        <button type="button" id="btnUpdateNow" class="link-btn" style="font-weight: 600;">
+          Atualizar agora
+        </button>
+        <button type="button" id="btnDownloadUpdate" class="link-btn">
+          Abrir no GitHub
+        </button>
+      </div>
     </div>
   </footer>
 
@@ -508,15 +527,48 @@
 
     const btnUpdate = document.getElementById("btnUpdate");
     const updateStatus = document.getElementById("updateStatus");
+    const btnDownloadUpdate = document.getElementById("btnDownloadUpdate");
     const appVersionEl = document.getElementById("appVersion");
     if (window.agentApi?.getAppVersion) {
       window.agentApi.getAppVersion().then(function(v) {
         if (appVersionEl && v) appVersionEl.textContent = "Versão " + v;
       }).catch(function() {});
     }
+    const updateActions = document.getElementById("updateActions");
+    const btnUpdateNow = document.getElementById("btnUpdateNow");
+    if (btnDownloadUpdate && window.agentApi?.openUrl) {
+      btnDownloadUpdate.addEventListener("click", () => {
+        const url = btnDownloadUpdate.getAttribute("data-release-url");
+        if (url) window.agentApi.openUrl(url);
+      });
+    }
+    if (btnUpdateNow && window.agentApi?.downloadAndReplace) {
+      btnUpdateNow.addEventListener("click", async () => {
+        btnUpdateNow.disabled = true;
+        btnUpdateNow.textContent = "Baixando…";
+        try {
+          const result = await window.agentApi.downloadAndReplace();
+          if (result?.ok) {
+            updateStatus.textContent = "Atualização baixada. O app fechará e reabrirá em instantes.";
+            updateStatus.style.color = "var(--online)";
+          } else {
+            updateStatus.textContent = result?.message || "Erro ao atualizar.";
+            updateStatus.style.color = "var(--error)";
+            btnUpdateNow.disabled = false;
+            btnUpdateNow.textContent = "Atualizar agora";
+          }
+        } catch (e) {
+          updateStatus.textContent = "Erro ao atualizar.";
+          updateStatus.style.color = "var(--error)";
+          btnUpdateNow.disabled = false;
+          btnUpdateNow.textContent = "Atualizar agora";
+        }
+      });
+    }
     if (btnUpdate && window.agentApi?.checkForUpdates) {
       btnUpdate.addEventListener("click", async () => {
         updateStatus.style.display = "block";
+        if (updateActions) updateActions.style.display = "none";
         updateStatus.style.color = "var(--accent)";
         updateStatus.textContent = "Verificando…";
         try {
@@ -528,20 +580,29 @@
           if (result?.hasUpdate && result?.version) {
             updateStatus.textContent = "v" + result.version + " disponível.";
             updateStatus.style.color = "var(--online)";
+            if (gh?.releaseUrl && updateActions) {
+              btnDownloadUpdate.setAttribute("data-release-url", gh.releaseUrl);
+              updateActions.style.display = "flex";
+            }
           } else {
             const v = result?.currentVersion || "";
             let msg = v ? "Você está na v" + v + " (mais recente)." : "Versão mais recente.";
+            const hasNewerOnGh = gh?.tag && v && gh.tag.replace(/^v/, "") !== v;
             if (gh?.tag) {
               msg += " No GitHub: " + gh.tag;
               if (gh.assets?.length) msg += " — arquivos: " + gh.assets.join(", ");
-              if (!result?.hasUpdate && v && gh.tag.replace(/^v/, "") !== v) {
-                msg += ". Há versão nova no GitHub; se não atualizou, o asset deve se chamar monitoramento-agent.exe.";
+              if (hasNewerOnGh) {
+                msg += ". Use o botão abaixo para atualizar.";
               }
             } else if (gh?.error) {
               msg += " (GitHub: " + (gh.error === 404 ? "nenhuma release latest" : "erro " + gh.error) + ")";
             }
             updateStatus.textContent = msg;
             updateStatus.style.color = "var(--muted)";
+            if (hasNewerOnGh && gh?.releaseUrl && updateActions) {
+              btnDownloadUpdate.setAttribute("data-release-url", gh.releaseUrl);
+              updateActions.style.display = "flex";
+            }
           }
         } catch (e) {
           updateStatus.textContent = "Erro ao verificar.";

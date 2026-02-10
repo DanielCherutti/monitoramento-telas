@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld("agentApi", {
   minimizeToTray: () => ipcRenderer.invoke("window:minimize-to-tray"),
   getLogPath: () => ipcRenderer.invoke("path:logFile"),
   openLogFolder: () => ipcRenderer.invoke("shell:openLogFolder"),
+  openUrl: (url) => ipcRenderer.invoke("shell:openUrl", url),
   testConnection: (apiUrl, agentId) => ipcRenderer.invoke("connection:test", { apiUrl, agentId }),
   onConfigLoaded: (fn) => {
     ipcRenderer.on("config:loaded", (_event, config, agentRunning) => fn(config, agentRunning));
@@ -20,6 +21,7 @@ contextBridge.exposeInMainWorld("agentApi", {
     ipcRenderer.on("agent:error", (_event, message) => fn(message));
   },
   checkForUpdates: () => ipcRenderer.invoke("update:check"),
+  downloadAndReplace: () => ipcRenderer.invoke("update:downloadAndReplace"),
   getAppVersion: () => ipcRenderer.invoke("app:version"),
   getGithubLatestRelease: () => ipcRenderer.invoke("github:latest-release"),
   onUpdateAvailable: (fn) => ipcRenderer.on("update:available", (_event, version) => fn(version)),

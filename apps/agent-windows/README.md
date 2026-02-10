@@ -32,12 +32,8 @@ npm run build:exe
 ```
 
 Serão criados em **`apps/agent-windows/dist/`**:
-- **`monitoramento-agent.exe`** — executável portátil (copie e execute sem instalar); gerado em qualquer OS.
-- **`Monitoramento de Telas - Agente Setup 1.0.0.exe`** — instalador NSIS (só no Windows); quem instala recebe atualizações automáticas pelo app.
-
-**Se o instalador Setup não abrir** ao dar duplo clique: use o **portable** (`monitoramento-agent.exe`) — funciona igual. Para tentar ver o erro do Setup, abra o **Prompt de comando** ou **PowerShell** na pasta do .exe e rode:  
-`"Monitoramento de Telas - Agente Setup 1.0.0.exe"`  
-(com aspas). Se o Windows tiver bloqueado por segurança, em **Segurança do Windows** → Histórico de proteção veja se o arquivo foi bloqueado e permita.
+- **`monitoramento-agent.exe`** — **use este.** Executável portátil: copie e execute, sem instalação. Funciona em qualquer Windows.
+- **`Monitoramento de Telas - Agente Setup 1.0.0.exe`** — instalador (opcional); em alguns PCs o Setup não abre; nesses casos use o portable.
 
 **No PC que será monitorado:**
 
