@@ -60,10 +60,10 @@ let agentRunning = false;
 
 function createWindow(showConfig = true) {
   const win = new BrowserWindow({
-    width: 420,
-    height: 400,
-    minWidth: 380,
-    minHeight: 380,
+    width: 440,
+    height: 500,
+    minWidth: 400,
+    minHeight: 460,
     title: "Monitoramento de Telas — Agente",
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
