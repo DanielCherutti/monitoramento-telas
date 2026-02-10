@@ -11,6 +11,7 @@ if (app.isPackaged) {
     autoUpdater = require("electron-updater").autoUpdater;
     autoUpdater.autoDownload = true;
     autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.allowPrerelease = true; // considera releases Beta / Pre-release
   } catch (_) {}
 }
 
