@@ -44,23 +44,28 @@ jobs:
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
 
-      - name: Encontrar artefato .exe
-        id: artifact
+      - name: Encontrar artefatos (.exe portable e instalador NSIS)
+        id: artifacts
         run: |
-          $exe = Get-ChildItem -Path "apps/agent-windows/dist" -Filter "*.exe" -Recurse | Select-Object -First 1
-          if (-not $exe) { Write-Error "Nenhum .exe encontrado em apps/agent-windows/dist" }
-          echo "PATH=$($exe.FullName)" >> $env:GITHUB_OUTPUT
-          echo "NAME=$($exe.Name)" >> $env:GITHUB_OUTPUT
+          $dist = "apps/agent-windows/dist"
+          $exes = Get-ChildItem -Path $dist -Filter "*.exe" -Recurse | Where-Object { $_.FullName -notmatch "\\win-unpacked\\" }
+          if (-not $exes -or $exes.Count -eq 0) { Write-Error "Nenhum .exe encontrado em $dist" }
+          $paths = $exes | ForEach-Object { $_.FullName }
+          $names = $exes | ForEach-Object { $_.Name }
+          echo "PATHS<<EOF" >> $env:GITHUB_OUTPUT
+          echo "$($paths -join "`n")" >> $env:GITHUB_OUTPUT
+          echo "EOF" >> $env:GITHUB_OUTPUT
+          echo "NAMES=$($names -join ", ")" >> $env:GITHUB_OUTPUT
 
-      - name: Criar Release e enviar .exe
+      - name: Criar Release e enviar artefatos
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Agente Windows ${{ steps.version.outputs.VERSION }}
           body: |
-            Atualização automática do agente de monitoramento.
-            Baixe **${{ steps.artifact.outputs.NAME }}** e execute. O agente instalado verificará atualizações pelo GitHub.
-          files: ${{ steps.artifact.outputs.PATH }}
+            **Portable:** baixe `monitoramento-agent.exe` e execute (sem instalação).
+            **Instalador (NSIS):** use o Setup para instalar; quem instala recebe atualizações automáticas pelo app.
+          files: ${{ steps.artifacts.outputs.PATHS }}
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

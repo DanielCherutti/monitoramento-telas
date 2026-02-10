@@ -44,7 +44,7 @@
       "node_modules/screenshot-desktop/**"
     ],
     "win": {
-      "target": "portable",
+      "target": ["portable", "nsis"],
       "signAndEditExecutable": false
     },
     "portable": {

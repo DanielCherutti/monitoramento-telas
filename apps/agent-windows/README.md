@@ -13,17 +13,24 @@ Agente que roda em cada computador a ser monitorado. Registra o dispositivo na A
 
 O agente é distribuído como um **único .exe** com janela de configuração integrada. Não é necessário usar BAT nem variáveis de ambiente: tudo é configurado pela interface.
 
-**Gerar o executável** (no seu ambiente de desenvolvimento, com Node instalado):
+**Gerar o executável e o instalador** (precisa ser em **Windows**, com Node instalado):
+
+```bash
+# Na raiz do repositório (monorepo):
+npm ci
+npm run build:exe --workspace=@monitoramento/agent-windows
+```
+
+Ou dentro da pasta do agente (depois de `npm install` na raiz e na pasta):
 
 ```bash
 cd apps/agent-windows
-npm install
 npm run build:exe
 ```
 
-Serão criados em **`dist/`**:
-- **`monitoramento-agent.exe`** — executável portátil (pode copiar só este arquivo)
-- **`Monitoramento de Telas - Agente Setup X.X.X.exe`** — instalador (opcional)
+Serão criados em **`apps/agent-windows/dist/`**:
+- **`monitoramento-agent.exe`** — executável portátil (copie e execute sem instalar)
+- **`Monitoramento de Telas - Agente Setup 1.0.0.exe`** — instalador NSIS (instala em Programas; quem instala recebe atualizações automáticas pelo app)
 
 **No PC que será monitorado:**
 
