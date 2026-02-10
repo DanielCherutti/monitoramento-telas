@@ -308,8 +308,7 @@ app.whenReady().then(() => {
         "timeout /t 2 /nobreak > nul\r\n" +
         "copy /Y \"" + newExePath.replace(/\"/g, "\"\"") + "\" \"" + currentExe.replace(/\"/g, "\"\"") + "\"\r\n" +
         "start \"\" \"" + currentExe.replace(/\"/g, "\"\"") + "\"\r\n" +
-        "del \"" + newExePath.replace(/\"/g, "\"\"") + "\"\r\n" +
-        "del \"%~f0\"\r\n";
+        "del \"" + newExePath.replace(/\"/g, "\"\"") + "\"\r\n";
       fs.writeFileSync(batPath, batContent, "utf8");
 
       // Executa o .bat em processo separado (start /b) para não ser encerrado quando o app sair
