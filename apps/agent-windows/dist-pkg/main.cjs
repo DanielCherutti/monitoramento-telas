@@ -43,22 +43,28 @@ async function run(screenshot, config) {
     const listDisplays = screenshot.listDisplays ?? (() => Promise.resolve([{ id: 0, name: "Principal" }]));
     const captureAll = screenshot.all ?? (async () => [await screenshot({ format: "jpg" })]);
     async function register() {
-        const res = await fetch(`${cfg.API_URL}/devices/register`, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-                agentId: cfg.AGENT_ID,
-                hostname: cfg.HOSTNAME,
-                secret: cfg.REGISTRATION_SECRET,
-            }),
-        });
-        if (!res.ok) {
-            const text = await res.text();
-            log(`[register] Falha: ${res.status} ${text}`);
+        try {
+            const res = await fetch(`${cfg.API_URL}/devices/register`, {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                    agentId: cfg.AGENT_ID,
+                    hostname: cfg.HOSTNAME,
+                    secret: cfg.REGISTRATION_SECRET,
+                }),
+            });
+            if (!res.ok) {
+                const text = await res.text();
+                log(`[register] Falha: ${res.status} ${text}`);
+                return false;
+            }
+            log(`[register] Dispositivo registrado: ${cfg.AGENT_ID} ${cfg.HOSTNAME}`);
+            return true;
+        }
+        catch (err) {
+            log(`[register] Erro de rede: ${err.message} (VPN/rede indisponível — tentando de novo em 15s)`);
             return false;
         }
-        log(`[register] Dispositivo registrado: ${cfg.AGENT_ID} ${cfg.HOSTNAME}`);
-        return true;
     }
     function connectPreview() {
         const url = `${WS_URL}/ws/device/preview?agentId=${encodeURIComponent(cfg.AGENT_ID)}`;
@@ -125,10 +131,15 @@ async function run(screenshot, config) {
     log(`Agente de monitoramento — ${cfg.AGENT_ID} ${cfg.HOSTNAME}`);
     log(`API: ${cfg.API_URL} | Preview: ${cfg.FPS} fps`);
     for (;;) {
-        const ok = await register();
-        if (ok)
-            break;
-        log(`Não foi possível registrar. Tentando novamente em ${REGISTER_RETRY_MS / 1000}s… (conecte a VPN se necessário)`);
+        try {
+            const ok = await register();
+            if (ok)
+                break;
+        }
+        catch (err) {
+            log(`[register] Erro: ${err.message}. Tentando novamente em ${REGISTER_RETRY_MS / 1000}s.`);
+        }
+        log(`Aguardando ${REGISTER_RETRY_MS / 1000}s para tentar de novo… (conecte a VPN para conectar automaticamente)`);
         await new Promise((r) => setTimeout(r, REGISTER_RETRY_MS));
     }
     function connectAndRun() {
