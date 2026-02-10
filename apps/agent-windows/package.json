@@ -12,7 +12,7 @@
     "build": "tsc -p tsconfig.json",
     "build:pkg": "tsc -p tsconfig.pkg.json && node -e \"require('fs').copyFileSync('dist-pkg/main.js','dist-pkg/main.cjs')\"",
     "electron": "npm run build:pkg && electron .",
-    "build:exe": "npm run build:pkg && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win",
+    "build:exe": "npm run build:pkg && node scripts/build-win.cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
