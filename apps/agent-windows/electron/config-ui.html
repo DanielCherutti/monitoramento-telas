@@ -6,272 +6,249 @@
   <title>Monitoramento de Telas — Configuração</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0f0f12;
-      --surface: #18181c;
-      --surface-hover: #1f1f24;
-      --border: #2a2a32;
-      --text: #e4e4e7;
-      --text-muted: #a1a1aa;
-      --accent: #6366f1;
-      --accent-hover: #818cf8;
-      --success: #22c55e;
-      --error: #ef4444;
-      --radius: 12px;
-      --radius-sm: 8px;
-      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --bg: #0c0c0e;
+      --surface: #141416;
+      --border: rgba(255,255,255,0.06);
+      --text: #fafafa;
+      --text-muted: #71717a;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #10b981;
+      --error: #f43f5e;
+      --radius: 10px;
+      --radius-sm: 6px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 28px 24px 24px;
+      padding: 32px 28px 24px;
+      font-size: 14px;
       -webkit-font-smoothing: antialiased;
     }
 
     .header {
-      margin-bottom: 28px;
-      text-align: center;
+      margin-bottom: 32px;
     }
 
     .header h1 {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 600;
       letter-spacing: -0.02em;
       color: var(--text);
     }
 
     .header p {
-      margin-top: 6px;
-      font-size: 0.875rem;
+      margin-top: 4px;
+      font-size: 13px;
       color: var(--text-muted);
+      font-weight: 400;
     }
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow);
-    }
-
-    .card h2 {
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-      margin-bottom: 16px;
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
     .field {
-      margin-bottom: 18px;
-    }
-
-    .field:last-child {
-      margin-bottom: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
     .field label {
-      display: block;
-      font-size: 0.8125rem;
+      font-size: 12px;
       font-weight: 500;
-      color: var(--text);
-      margin-bottom: 6px;
+      color: var(--text-muted);
+      letter-spacing: 0.01em;
     }
 
     .field input {
       width: 100%;
-      padding: 12px 14px;
-      font-size: 0.9375rem;
+      padding: 10px 12px;
+      font-size: 14px;
       font-family: inherit;
       color: var(--text);
-      background: var(--bg);
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .field input::placeholder {
       color: var(--text-muted);
-      opacity: 0.8;
+      opacity: 0.7;
     }
 
     .field input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
     }
 
     .field .hint {
-      font-size: 0.75rem;
+      font-size: 11px;
       color: var(--text-muted);
-      margin-top: 4px;
+      opacity: 0.9;
     }
 
-    .actions {
-      margin-top: 24px;
+    .row {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
     .btn {
-      padding: 12px 20px;
-      font-size: 0.9375rem;
-      font-weight: 600;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 500;
       font-family: inherit;
       border: none;
       border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: background 0.15s, transform 0.05s;
+      transition: background 0.15s, opacity 0.15s;
     }
 
-    .btn:active {
-      transform: scale(0.98);
-    }
+    .btn:active { opacity: 0.9; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .btn-primary {
       background: var(--accent);
       color: white;
     }
 
-    .btn-primary:hover {
+    .btn-primary:hover:not(:disabled) {
       background: var(--accent-hover);
     }
 
-    .btn-primary:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
     }
 
-    .btn-secondary {
-      background: var(--surface-hover);
+    .btn-ghost:hover {
       color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .btn-secondary:hover {
-      background: var(--border);
+      background: rgba(255,255,255,0.04);
     }
 
     .status {
-      margin-top: 20px;
-      padding: 14px 16px;
+      margin-top: 4px;
+      padding: 10px 12px;
       border-radius: var(--radius-sm);
-      font-size: 0.875rem;
+      font-size: 13px;
       display: none;
     }
 
-    .status.show {
-      display: block;
-    }
+    .status.show { display: block; }
 
     .status.success {
-      background: rgba(34, 197, 94, 0.12);
-      border: 1px solid rgba(34, 197, 94, 0.3);
+      background: rgba(16, 185, 129, 0.12);
       color: var(--success);
     }
 
     .status.error {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      background: rgba(244, 63, 94, 0.12);
       color: var(--error);
     }
 
     .status.loading {
-      background: rgba(99, 102, 241, 0.1);
-      border: 1px solid rgba(99, 102, 241, 0.25);
+      background: rgba(59, 130, 246, 0.1);
       color: var(--accent);
     }
 
-    .spinner {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid currentColor;
-      border-right-color: transparent;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: -2px;
-      margin-right: 8px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
     .footer {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 0.75rem;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
       color: var(--text-muted);
     }
+
+    .footer-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .footer-actions .btn {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    #logPathHint, #updateStatus {
+      margin-top: 8px;
+      font-size: 11px;
+      word-break: break-all;
+    }
+
+    #updateStatus { display: none; }
   </style>
 </head>
 <body>
-  <div class="header">
+  <header class="header">
     <h1>Monitoramento de Telas</h1>
-    <p>Configure a conexão com o servidor e inicie o agente</p>
-  </div>
+    <p>Conecte este computador ao servidor</p>
+  </header>
 
-  <div class="card">
-    <h2>Conexão</h2>
-    <form id="form">
-      <div class="field">
-        <label for="apiUrl">URL da API *</label>
-        <input type="url" id="apiUrl" name="apiUrl" placeholder="http://192.168.4.90:4001" required />
-        <div class="hint">Endereço do servidor (ex.: http://IP:4001)</div>
-      </div>
-      <div class="field">
-        <label for="agentId">ID do agente</label>
-        <input type="text" id="agentId" name="agentId" placeholder="PC-SALA-01" />
-        <div class="hint">Identificador único (opcional; usa o nome do PC se vazio)</div>
-      </div>
-      <div class="field">
-        <label for="hostname">Nome exibido</label>
-        <input type="text" id="hostname" name="hostname" placeholder="Sala Reuniões" />
-        <div class="hint">Nome que aparece no dashboard (opcional)</div>
-      </div>
-      <div class="field">
-        <label for="registrationSecret">Segredo de registro *</label>
-        <input type="password" id="registrationSecret" name="registrationSecret" placeholder="dev-agent-secret" />
-        <div class="hint">Deve ser igual ao configurado na API</div>
-      </div>
-      <div class="field">
-        <label for="screenCount">Número de telas (opcional)</label>
-        <input type="number" id="screenCount" name="screenCount" min="1" max="8" placeholder="1 = automático" />
-        <div class="hint">Se tiver 2+ monitores e o seletor de tela não aparecer na plataforma, coloque 2 (ou quantas telas tiver).</div>
-      </div>
-      <div class="actions">
-        <button type="submit" class="btn btn-primary" id="btnSave">Salvar e iniciar</button>
-        <button type="button" class="btn btn-secondary" id="btnReconfig">Apenas reconfigurar</button>
-        <button type="button" class="btn btn-secondary" id="btnTest">Testar conexão</button>
-      </div>
-    </form>
+  <form id="form">
+    <div class="field">
+      <label for="apiUrl">URL da API</label>
+      <input type="url" id="apiUrl" name="apiUrl" placeholder="http://192.168.4.90:4001" required />
+      <span class="hint">Endereço do servidor (ex.: http://IP:4001)</span>
+    </div>
+
+    <div class="field">
+      <label for="agentId">ID do agente</label>
+      <input type="text" id="agentId" name="agentId" placeholder="PC-SALA-01" />
+      <span class="hint">Opcional — usa o nome do PC se vazio</span>
+    </div>
+
+    <div class="field">
+      <label for="hostname">Nome exibido</label>
+      <input type="text" id="hostname" name="hostname" placeholder="Sala Reuniões" />
+      <span class="hint">Opcional — nome no dashboard</span>
+    </div>
+
+    <div class="field">
+      <label for="registrationSecret">Segredo de registro</label>
+      <input type="password" id="registrationSecret" name="registrationSecret" placeholder="••••••••" />
+      <span class="hint">Mesmo valor configurado na API</span>
+    </div>
+
+    <div class="field">
+      <label for="screenCount">Número de telas</label>
+      <input type="number" id="screenCount" name="screenCount" min="1" max="8" placeholder="1 (automático)" />
+      <span class="hint">Opcional — use 2+ se tiver vários monitores</span>
+    </div>
+
     <div class="status" id="status"></div>
-    <div class="status" id="testResult" style="margin-top: 10px;"></div>
-  </div>
+    <div class="status" id="testResult"></div>
 
-  <div class="footer">
-    As configurações são salvas localmente. O agente tenta conectar a cada 15 s até a API estar acessível (ex.: após conectar a VPN).
-    <br />
-    <button type="button" class="btn btn-secondary" id="btnLog" style="margin-top: 10px; font-size: 0.8rem;">Abrir pasta do log (diagnóstico)</button>
-    <button type="button" class="btn btn-secondary" id="btnUpdate" style="margin-top: 10px; margin-left: 8px; font-size: 0.8rem;">Verificar atualizações</button>
-    <div id="logPathHint" style="margin-top: 6px; font-size: 0.7rem; color: var(--text-muted); word-break: break-all;"></div>
-    <div id="updateStatus" style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted); display: none;"></div>
-  </div>
+    <div class="row" style="margin-top: 4px;">
+      <button type="submit" class="btn btn-primary" id="btnSave">Salvar e iniciar</button>
+      <button type="button" class="btn btn-ghost" id="btnReconfig">Reconfigurar</button>
+      <button type="button" class="btn btn-ghost" id="btnTest">Testar conexão</button>
+    </div>
+  </form>
+
+  <footer class="footer">
+    <p>Configuração salva localmente. O agente tenta conectar a cada 15 s até a API estar acessível.</p>
+    <div class="footer-actions">
+      <button type="button" class="btn btn-ghost" id="btnLog">Abrir pasta do log</button>
+      <button type="button" class="btn btn-ghost" id="btnUpdate">Verificar atualizações</button>
+    </div>
+    <div id="logPathHint"></div>
+    <div id="updateStatus"></div>
+  </footer>
 
   <script>
     const form = document.getElementById("form");
@@ -311,9 +288,9 @@
 
     function setStatusFromAgent(running) {
       if (running) {
-        showStatus("Conectado ao servidor. Agente em execução.", "success");
+        showStatus("Conectado. Agente em execução.", "success");
       } else {
-        showStatus("Conectando ao servidor… Se a VPN estiver desconectada, o agente tentará a cada 15 s até conectar.", "loading");
+        showStatus("Conectando… Se a VPN estiver desconectada, o agente tentará a cada 15 s.", "loading");
       }
     }
 
@@ -323,7 +300,7 @@
         if (config && config.apiUrl) setStatusFromAgent(agentRunning);
       });
       window.agentApi.onAgentStarted(() => {
-        showStatus("Conectado ao servidor. Agente em execução.", "success");
+        showStatus("Conectado. Agente em execução.", "success");
         btnSave.disabled = false;
         if (window.agentApi.minimizeToTray) window.agentApi.minimizeToTray();
       });
@@ -332,7 +309,7 @@
         btnSave.disabled = false;
       });
       window.agentApi.onAgentStatus?.((running) => {
-        if (running) showStatus("Conectado ao servidor. Agente em execução.", "success");
+        if (running) showStatus("Conectado. Agente em execução.", "success");
         else hideStatus();
       });
 
@@ -386,13 +363,11 @@
     if (btnLog && window.agentApi) {
       if (window.agentApi.getLogPath) {
         window.agentApi.getLogPath().then((p) => {
-          if (logPathHint && p) logPathHint.textContent = "Log: " + p;
+          if (logPathHint && p) logPathHint.textContent = p;
         }).catch(() => {});
       }
       if (window.agentApi.openLogFolder) {
-        btnLog.addEventListener("click", () => {
-          window.agentApi.openLogFolder();
-        });
+        btnLog.addEventListener("click", () => window.agentApi.openLogFolder());
       }
     }
 
@@ -402,13 +377,13 @@
       btnUpdate.addEventListener("click", async () => {
         updateStatus.style.display = "block";
         updateStatus.style.color = "var(--accent)";
-        updateStatus.textContent = "Verificando atualizações…";
+        updateStatus.textContent = "Verificando…";
         try {
           await window.agentApi.checkForUpdates();
-          updateStatus.textContent = "Verificação concluída. Se houver nova versão, você será avisado.";
+          updateStatus.textContent = "Verificação concluída.";
           updateStatus.style.color = "var(--text-muted)";
         } catch (e) {
-          updateStatus.textContent = "Não foi possível verificar (use a versão instalada para atualizar pelo GitHub).";
+          updateStatus.textContent = "Não foi possível verificar.";
           updateStatus.style.color = "var(--error)";
         }
       });
@@ -422,24 +397,23 @@
       const apiUrl = form.apiUrl.value.trim();
       const agentId = form.agentId.value.trim() || "TEST";
       if (!apiUrl) {
-        showTestResult("Informe a URL da API antes de testar.", "error");
+        showTestResult("Informe a URL da API.", "error");
         return;
       }
-      if (!window.agentApi || !window.agentApi.testConnection) {
-        showTestResult("Teste de conexão não disponível nesta versão.", "error");
+      if (!window.agentApi?.testConnection) {
+        showTestResult("Teste não disponível nesta versão.", "error");
         return;
       }
-      showTestResult("Testando no processo do agente (API + WebSocket)…", "loading");
-
+      showTestResult("Testando conexão…", "loading");
       try {
         const result = await window.agentApi.testConnection(apiUrl, agentId);
-        if (result && result.ok) {
-          showTestResult(result.message || "Conexão OK. Você pode salvar e iniciar.", "success");
+        if (result?.ok) {
+          showTestResult(result.message || "Conexão OK.", "success");
         } else {
-          showTestResult(result && result.message ? result.message : "Erro ao testar conexão.", "error");
+          showTestResult(result?.message || "Erro ao testar.", "error");
         }
       } catch (err) {
-        showTestResult(err.message || "Erro ao testar conexão.", "error");
+        showTestResult(err?.message || "Erro ao testar.", "error");
       }
     });
   </script>

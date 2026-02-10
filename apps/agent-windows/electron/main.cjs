@@ -16,6 +16,21 @@ if (app.isPackaged) {
 
 const CONFIG_PATH = path.join(app.getPath("userData"), "config.json");
 
+// Uma única instância: abrir o .exe de novo só traz a janela à frente
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+  process.exit(0);
+}
+app.on("second-instance", () => {
+  if (mainWindow) {
+    mainWindow.show();
+    mainWindow.focus();
+  } else {
+    mainWindow = createWindow(true);
+  }
+});
+
 function getConfigPath() {
   return CONFIG_PATH;
 }
@@ -84,12 +99,21 @@ function createWindow(showConfig = true) {
 
 const { Menu } = require("electron");
 
-function createTray() {
+// Ícone mínimo 16x16 (cinza) para bandeja quando tray-icon.png não existir
+const TRAY_FALLBACK_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHklEQVQ4y2NgGAWjYBSMglEwCkbBKBgFDPQCDADhBAV/ePhjZAAAAABJRU5ErkJggg==";
+
+function getTrayIcon() {
   const iconPath = path.join(__dirname, "tray-icon.png");
-  if (!fs.existsSync(iconPath)) return;
+  if (fs.existsSync(iconPath)) {
+    const img = nativeImage.createFromPath(iconPath);
+    if (!img.isEmpty()) return img;
+  }
+  return nativeImage.createFromDataURL(TRAY_FALLBACK_ICON);
+}
+
+function createTray() {
   try {
-    const icon = nativeImage.createFromPath(iconPath);
-    if (icon.isEmpty()) return;
+    const icon = getTrayIcon();
     tray = new Tray(icon);
     tray.setToolTip("Agente de Monitoramento — clique para abrir");
     tray.on("click", () => {
